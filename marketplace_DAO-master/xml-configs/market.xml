@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+	.xml de configuracao multicast udp
+-->
+<config xmlns="urn:org:jgroups"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="urn:org:jgroups http://www.jgroups.org/schema/jgroups.xsd">
+    <UDP/>
+	<!-- Usado paa deteccao de membros, descobrir o coordenador. Envia ping para enderoco multicast IP. -->
+    <PING/>
+	<!-- Mesclagem de subcluster, em um cluster. -->
+    <MERGE3/>
+	<!-- Detecta falhas -->
+    <FD_SOCK/>
+    <FD_ALL/>
+	<!-- Verifica se um membro esta morto, enviando ping. -->
+    <VERIFY_SUSPECT/>
+	<!-- Permite conclusao de threads e bloqueio de novas. -->
+    <BARRIER/>
+	<!-- Ambos para confirmacao de recebimento de mensagem. Fornecem entrega confiavel e FIFO-->
+    <pbcast.NAKACK2/>
+    <UNICAST3/>
+	<!-- Exclui mensagens que foram vistas por todos. Coleta lixo de mensagens. -->
+    <pbcast.STABLE/>
+    <!-- Responsavel pela entrada e saida de membros, nova visao-->
+	<pbcast.GMS/>
+	<!-- Controle de fluxo unicast. Fornece controle de fluxo entre 2 membros -->
+    <UFC/>
+	<!-- Controle de fluxo multicast. Fornece controle de fluxo entre um remetente e todos os membros do cluster. -->
+    <MFC/>
+	<!-- Mantem ordem total do provedor para mensagem multicast. Esbelece ordem global -->
+    <SEQUENCER />
+	<!-- Para unicast e multicast. Fragmenta e desfragmenta mensagens para envio e recebimento -->
+    <FRAG2/>
+	<!-- Protocolo para confirmacao de entrega de mensagem, pois udp nao confirma. Usa RSVP com o nakacks e unicast -->
+	<RSVP/>
+	<!-- Protocolo de transferencia de estados original. Bytes -->
+    <pbcast.STATE_TRANSFER />
+
+	<!-- Usado para bloqueio dos clusters. -->
+    <CENTRAL_LOCK />
+    
+</config>
