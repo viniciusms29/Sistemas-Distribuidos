@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+	.xml de configuracao multicast udp
+-->
+<config xmlns="urn:org:jgroups"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="urn:org:jgroups http://www.jgroups.org/schema/jgroups.xsd">
+    <!-- UDP -> O protocolo de transporte: 
+        mcast_port         		:  A porta multicast usada para enviar e receber pacotes
+        mcast_recv_buf_size		:  O tamanho do buffer de recebimento do soquete de datagramas de multicast.
+        mcast_send_buf_size		:  O tamanho do buffer de envio do soquete de datagramas de multicast.
+		ucast_recv_buf_size		:  O tamanho do buffer de recebimento do soquete de datagramas de unicast.
+        ucast_send_buf_size		:  O tamanho do buffer de envio do soquete de datagramas de unicast.
+    -->
+	<UDP 
+			mcast_port="45566" 
+			ip_mcast="true"  
+			mcast_send_buf_size="150000" 
+			mcast_recv_buf_size="150000"   
+			ucast_send_buf_size="150000" 
+			ucast_recv_buf_size="150000"/>
+		
+	<!-- PING -> Usado pra deteccao de membros, descobrir o coordenador. Envia ping para enderoco multicast IP. 
+	-->
+    <PING/>
+	<!-- MERGE3 -> 
+	  Mesclagem de subcluster, em um cluster.
+        max_interval  			: Intervalo (em ms) quando a proxima mensagem de informação sera enviada.
+        min_interval  			: Tempo minimo (em ms) antes de enviar uma mensagem informativa.
+        check_interval			: Intervalo (em ms) após o qual checamos inconsistências de exibição. 
+    -->
+    <MERGE3
+			max_interval = "10000"
+			min_interval="5000"
+			check_interval="15000"/>
+	<!-- FD_SOCK junto com FD_ALL -> Detecta falhas
+	  FD_SOCK -> detecta nós mortos imediatamente
+	  FD_ALL  -> detecta membros travados. 
+      Usado para suspeitar de membros que demoram a responder. Utiliza timestamps.
+        timeout 				: Tempo limite após o qual um nó P é suspeito se nem uma pulsação nem dados foram recebidos de P.
+		interval				: Intervalo no qual uma HEARTBEAT é enviada para o cluster.
+        timeout_check_interval		: Intervalo no qual os tempos limite do HEARTBEAT são verificados.
+    -->	
+    <FD_SOCK/>
+    <FD_ALL
+			timeout="10000"
+			interval="3000"
+			timeout_check_interval="2000"/>
+	<!-- VERIFY_SUSPECT -> 
+	  Verifica se um membro suspeito esta morto, enviando ping antes de excluí-lo
+		timeout					: Número de milissegundos para aguardar uma resposta de um membro suspeito.
+	-->
+    <VERIFY_SUSPECT timeout="900"/>
+	<!-- NAKACK2 e UNICAST3 ->
+	  Ambos para confirmacao de recebimento de mensagem. Usado para realizar a entrega sem perdas e FIFO de mensagens 
+	  multicast(NAKACK2) e unicast(UNICAST3).
+	  -->
+    <pbcast.NAKACK2/>
+    <UNICAST3/>
+    <BARRIER />
+	<!-- STABLE -> Exclui mensagens que foram vistas por todos. Coleta lixo de mensagens.
+	-->
+    <pbcast.STABLE/>
+	<!-- GMS ->
+	  Responsavel pela entrada e saida de membros no cluster, nova visao.
+        join_timeout               	: Limite de tempo para juntar-se.
+        num_prev_mbrs              	: Determina o nº max. de membros antigos para manter na historia.
+		log_view_warnings			: Registra avisos para a recepção de visualizações menores que a atual e para visualizações que não incluem.
+        view_ack_collection_timeout : Tempo em ms para esperar por todas as VIEW acks.
+    -->
+	<pbcast.GMS
+			join_timeout = "3000"
+			num_prev_mbrs = "30"
+			log_view_warnings="false"
+			view_ack_collection_timeout = "3000"/>
+	<!-- UFC -> 
+	  Controle de fluxo unicast. Fornece controle de fluxo entre 2 membros
+		max_credits					: Número máximo de bytes para enviar por receptor até que um ack seja recebido para prosseguir.
+		min_threshold				: O limite (como uma porcentagem de max_credits) no qual um receptor envia mais créditos para um remetente. 
+	-->
+	<UFC 
+			max_credits="2M"
+			min_threshold="0.4"/>
+	<!-- MFC -> 
+	  Controle de fluxo multicast. Fornece controle de fluxo entre um remetente e todos os membros do cluster.
+		max_credits					: Número máximo de bytes para enviar por receptor até que um ack seja recebido para prosseguir,
+		min_threshold				: O limite (como uma porcentagem de max_credits) no qual um receptor envia mais créditos para um remetente. 
+	-->
+    <MFC 
+			max_credits="2M"
+			min_threshold="0.4"/>
+	<!-- SEQUENCER -> 
+	  Mantem ordem total do provedor para mensagem multicast. Esbelece ordem global
+	-->
+    <SEQUENCER/>
+	<!-- FRAG2 ->
+      Para unicast e multicast. Fragmenta e desfragmenta mensagens para envio e recebimento. Usado para fragentar mensagens maiores em menores.
+    -->
+    <FRAG2/>	
+	<!-- RSVP (Responda por favor) -> 
+	  Fortalece os protocolos confiáveis (NAKACK2 e UNICAST3)
+		resend_interval				: Intervalo (em milissegundos) no qual reenviamos a solicitação de RSVP. 
+		timeout						: Tempo máximo em milissegundos a bloquear para uma mensagem RSVP.
+	-->
+	<RSVP
+			resend_interval="2000"
+			timeout="10000"/>
+	<!-- STATE_TRANSFER ->
+	  Protocolo de transferencia de estados original. Bytes -->
+    <pbcast.STATE_SOCK />
+	<!-- CENTRAL_LOCK ->
+	  Usado para bloqueio dos clusters. -->
+	<CENTRAL_LOCK />
+</config>
